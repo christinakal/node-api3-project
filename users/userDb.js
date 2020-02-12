@@ -12,7 +12,7 @@ module.exports = {
 function get() {
   return db('users');
 }
-
+ 
 function getById(id) {
   return db('users')
     .where({ id })
