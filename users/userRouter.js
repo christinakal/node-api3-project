@@ -20,7 +20,7 @@ router.get('/', (req, res) => {
     });
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', validateUserId, (req, res) => {
   // do your magic!
   const id = req.params.id;
   Users.getById(id)
@@ -37,7 +37,7 @@ router.get('/:id', (req, res) => {
   })
 });
 
-router.get('/:id/posts', (req, res) => {
+router.get('/:id/posts',validateUserId, (req, res) => {
   // do your magic!
   const id = req.params.id;
 
@@ -70,7 +70,7 @@ router.post('/', validateUser, (req, res) => {
     }); 
 });
 
-router.post('/:id/posts', validateUserId, (req, res) => {
+router.post('/:id/posts', validateUserId, validatePost, (req, res) => {
   // do your magic!
   const post = req.body;
   Posts.insert(post)
