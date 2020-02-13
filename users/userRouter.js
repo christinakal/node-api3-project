@@ -56,7 +56,8 @@ router.get('/:id/posts', (req, res) => {
 
 router.post('/', (req, res) => {
   //do your magic!
-  Users.insert(req.body)
+  const name = req.body.name;
+  Users.insert({name})
     .then(user => {
       res.status(201).json(user);
     })
@@ -71,24 +72,35 @@ router.post('/', (req, res) => {
 
 router.post('/:id/posts', (req, res) => {
   // do your magic!
-  // const id = req.params.id;
-  // const post = { ...req.body, user_id: id };
-  // Users.insert(post)
-  // .then(post => {
-  //   res.status(200).json(post);
-  // })
-  // .catch( error => {
-  //   console.log(error);
-  //   res.status(500).json({message: "Sorry, we can't proceed"});
-  // })
+  const post = req.body;
+  Posts.insert(post)
+    .then(post => {
+      res.status(201).json(post);
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({ error: "Error adding post" });
+    });
 });
 
 router.delete('/:id', (req, res) => {
   // do your magic!
+  const id = req.params.id;
+  Users.remove(id).then(() => res.status(204).end());
 });
 
 router.put('/:id', (req, res) => {
   // do your magic!
+  const { id } = req.params;
+  const { name } = req.body;
+  Users.update(id, { name }).then(() => {
+    Users.getById(id)
+      .then(user => res.status(200).json(user))
+      .catch(err => {
+        console.log(err);
+        res.status(500).json({ error: "Error getting user" });
+      });
+  });
 });
 
 //custom middleware
