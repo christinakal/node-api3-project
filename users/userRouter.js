@@ -39,7 +39,20 @@ router.get('/:id', (req, res) => {
 
 router.get('/:id/posts', (req, res) => {
   // do your magic!
+  const id = req.params.id;
+
+  Users.getUserPosts(id)
+  .then(posts => {
+    res.status(200).json(posts);
+  })
+  .catch(error => {
+    console.log(error);
+    res.status(500).json({ errorMessage: "Error getting user's posts"});
+  })
 });
+
+
+
 
 router.post('/', (req, res) => {
   //do your magic!
