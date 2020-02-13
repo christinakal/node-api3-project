@@ -54,7 +54,7 @@ router.get('/:id/posts', (req, res) => {
 
 
 
-router.post('/', (req, res) => {
+router.post('/', validateUser, (req, res) => {
   //do your magic!
   const name = req.body.name;
   Users.insert({name})
@@ -70,7 +70,7 @@ router.post('/', (req, res) => {
     }); 
 });
 
-router.post('/:id/posts', (req, res) => {
+router.post('/:id/posts', validateUserId, (req, res) => {
   // do your magic!
   const post = req.body;
   Posts.insert(post)
@@ -83,13 +83,13 @@ router.post('/:id/posts', (req, res) => {
     });
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', validateUserId, (req, res) => {
   // do your magic!
   const id = req.params.id;
   Users.remove(id).then(() => res.status(204).end());
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', validateUserId, (req, res) => {
   // do your magic!
   const { id } = req.params;
   const { name } = req.body;
@@ -107,14 +107,41 @@ router.put('/:id', (req, res) => {
 
 function validateUserId(req, res, next) {
   // do your magic!
+  const { id } = req.params;
+  Users.getById(id).then(user => {
+    if (user) {
+      req.user = user;
+      next();
+    } else {
+      res.status(404).json({ error: "The specified user does not exist" });
+    }
+  });
 }
 
 function validateUser(req, res, next) {
   // do your magic!
+  const { name } = req.body;
+  if (!name) {
+    res.status(400).json({ error: "Name required" });
+  } else if (typeof name !== "string") {
+    res.status(400).json({ error: "Name must be a string" });
+  } else {
+    next();
+  }
 }
 
 function validatePost(req, res, next) {
   // do your magic!
+  const { id: user_id } = req.params;
+  const { text } = req.body;
+  if (!req.body) {
+    res.status(400).json({ error: "Post requires body" });
+  } else if (!text) {
+    res.status(400).json({ error: "Post requires text" });
+  } else {
+    req.body = { user_id, text };
+    next();
+  }
 }
 
 module.exports = router;
